@@ -12,7 +12,6 @@ jobs:
 
     env:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-      DISCORD_WEBHOOK_ADMIN_URL: ${{ secrets.DISCORD_WEBHOOK_ADMIN_URL }}
 
     steps:
     - name: 코드 체크아웃
@@ -35,7 +34,6 @@ jobs:
     - name: 환경 변수 파일 생성
       run: |
         echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" >> .env
-        echo "DISCORD_WEBHOOK_ADMIN_URL=${{ secrets.DISCORD_WEBHOOK_ADMIN_URL }}" >> .env
         echo "PORT=3000" >> .env
 
     - name: 빌드 테스트
