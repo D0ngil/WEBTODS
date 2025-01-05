@@ -45,4 +45,5 @@ app.post('/api/chat', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
   console.log(__dirname);
+  console.log(process.cwd());
 });
