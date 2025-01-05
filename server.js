@@ -2,7 +2,10 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const rateLimit = require('express-rate-limit');
+const cors = require('cors');
+const DOMPurify = require('isomorphic-dompurify'); // XSS 방어를 위한 라이브러리
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 dotenv.config();
 
@@ -15,33 +18,64 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'Public')));
 
+// CORS 설정 (특정 도메인만 허용)
+app.use(cors({
+  origin: 'https://yourdomain.com',
+  methods: ['POST']
+}));
+
+// Rate Limiting (1분에 최대 5회 요청)
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000,  // 1분
+  max: 5,  // 최대 5회 요청
+  message: '1분에 최대 5번만 메시지를 보낼 수 있습니다.'
+});
+app.use('/api/chat', limiter);
+
+// Discord로 메시지 전송하는 함수
 async function sendToDiscord(webhookUrl, content) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000); // 5초 타임아웃
+
   const response = await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content })
+    body: JSON.stringify({ content }),
+    signal: controller.signal
   });
+
+  clearTimeout(timeout);
+
   if (!response.ok) {
     throw new Error(`Discord Webhook Error: ${response.status} ${response.statusText}`);
   }
 }
 
-// app.get('/', (req, res) => {
-//   res.sendFile(__dirname + '/public/index.html');
-// });
-
+// 메시지 전송 API
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message } = req.body;
-    await sendToDiscord(DISCORD_WEBHOOK_URL, message);
-    console.log('디스코드로 전송된 메시지:', message);
+    let { message } = req.body;
+
+    // 입력 값 검증 (유효성 검사 및 길이 제한)
+    if (!message || message.length > 200) {
+      return res.status(400).json({ success: false, error: '메시지가 유효하지 않거나 너무 깁니다.' });
+    }
+
+    // XSS 방지를 위한 DOMPurify 적용 (HTML, JS 제거)
+    const sanitizedMessage = DOMPurify.sanitize(message);
+
+    // Discord로 전송
+    await sendToDiscord(DISCORD_WEBHOOK_URL, sanitizedMessage);
+    console.log('디스코드로 전송된 메시지:', sanitizedMessage);
+
     return res.status(200).json({ success: true, msg: '메시지 전송 성공' });
   } catch (error) {
     console.error('디스코드 전송 에러:', error);
     return res.status(500).json({ success: false, error: '디스코드 메시지 전송 실패' });
   }
 });
-  
+
+// 서버 시작
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
   console.log(__dirname);
