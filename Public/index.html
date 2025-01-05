@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>도도동숲</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+   <div class="page-container">
+    <div id="status-icon" class="status-icon">
+    </div> 
+    <h1 class="title">도도동숲</h1>
+    <p class="subtitle">
+      익명, 숨기듯 펼치는 나만의 이야기.<br>
+      편견 없이, 무게 없이, 마음껏 얘기하세요.
+    </p>
+    <div class="chat-bar">
+      <div class="chat-icon">
+        <span class="material-icons">chat</span>
+      </div>
+      <input
+        type="text"
+        class="chat-bar__input"
+        id="messageInput"
+        placeholder="메시지를 입력하세요"
+      />
+      <div class="chat-send" id="sendBtn">
+        <span class="material-icons">send</span>
+      </div>
+    </div>  
+    <a href="https://discord.gg/KqqYbkDJhD" target="_blank" class="discord-link">
+      <img
+        src="https://media.discordapp.net/attachments/1325043712711200830/1325043720894283878/image.png?ex=677a5aa1&is=67790921&hm=ddf43bac1891deeb6807fef8d05483e0ce40582e70bd0563724268a1a4549f94&=&format=webp&quality=lossless&width=1024&height=1024"
+        alt="외부 이미지"
+        class="discord-icon"
+      />
+    </a>
+  </div>
+
+  <script>
+    const sendBtn = document.getElementById('sendBtn');
+    const messageInput = document.getElementById('messageInput');
+    const statusIcon = document.getElementById('status-icon');
+    function showStatusIcon(iconName, color, message) {
+      statusIcon.innerHTML = '';
+      const icon = document.createElement('span');
+      icon.classList.add('material-icons', 'status-icon__icon');
+      icon.textContent = iconName;
+      icon.style.color = color;
+      icon.title = message;
+      statusIcon.appendChild(icon);
+      statusIcon.style.display = 'block';
+      setTimeout(() => {
+        statusIcon.style.display = 'none';
+      }, 5000);
+    }
+
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) {
+        showStatusIcon('error', '#d63c3c', '메시지를 입력해주세요.');
+        return;
+      }
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message }),
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          showStatusIcon('check_circle', '#1f8f1f', '메시지 전송 성공!');
+          messageInput.value = '';
+        } else {
+          showStatusIcon('error', '#d63c3c', '메시지 전송 실패: ' + result.error);
+        }
+      } catch (err) {
+        console.error(err);
+        showStatusIcon('error', '#d63c3c', '서버 에러: ' + err.message);
+      }
+    }
+
+    sendBtn.addEventListener('click', () => {
+      sendMessage();
+    });
+
+    messageInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+
+</body>
+</html>

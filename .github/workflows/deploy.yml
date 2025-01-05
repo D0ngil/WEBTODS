@@ -1,0 +1,42 @@
+name: Node.js CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      DISCORD_WEBHOOK_ADMIN_URL: ${{ secrets.DISCORD_WEBHOOK_ADMIN_URL }}
+
+    steps:
+    - name: 코드 체크아웃
+      uses: actions/checkout@v3
+
+    - name: Node.js 설정
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+
+    - name: 의존성 설치
+      run: npm ci
+
+    - name: 린트 검사
+      run: |
+        npm install eslint --save-dev
+        npx eslint .
+
+    - name: 환경 변수 파일 생성
+      run: |
+        echo "DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}" >> .env
+        echo "DISCORD_WEBHOOK_ADMIN_URL=${{ secrets.DISCORD_WEBHOOK_ADMIN_URL }}" >> .env
+        echo "PORT=3000" >> .env
+
+    - name: 빌드 테스트
+      run: node -e "require('./server.js')" 
