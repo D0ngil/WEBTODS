@@ -26,9 +26,9 @@ async function sendToDiscord(webhookUrl, content) {
   }
 }
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
-});
+// app.get('/', (req, res) => {
+//   res.sendFile(__dirname + '/public/index.html');
+// });
 
 app.post('/api/chat', async (req, res) => {
   try {
@@ -44,4 +44,5 @@ app.post('/api/chat', async (req, res) => {
   
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  console.log(__dirname);
 });
