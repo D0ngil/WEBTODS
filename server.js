@@ -26,6 +26,10 @@ async function sendToDiscord(webhookUrl, content) {
   }
 }
 
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
