@@ -19,12 +19,12 @@
       <div class="chat-icon">
         <span class="material-icons">chat</span>
       </div>
-      <input
-        type="text"
+      <textarea
         class="chat-bar__input"
         id="messageInput"
         placeholder="메시지를 입력하세요"
-      />
+        rows="1"
+      ></textarea>
       <div class="chat-send" id="sendBtn">
         <span class="material-icons">send</span>
       </div>
@@ -86,8 +86,18 @@
       sendMessage();
     });
 
+    function adjustTextareaHeight(element) {
+      element.style.height = 'auto';
+      element.style.height = element.scrollHeight + 'px';
+    }
+
+    messageInput.addEventListener('input', function() {
+      adjustTextareaHeight(this);
+    });
+
     messageInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
         sendMessage();
       }
     });

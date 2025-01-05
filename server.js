@@ -26,6 +26,25 @@ async function sendToDiscord(webhookUrl, content) {
   }
 }
 
+let isSubmitting = false;
+
+messageInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    
+    // 이미 전송 중이면 무시
+    if (isSubmitting) return;
+    
+    isSubmitting = true;
+    sendMessage();
+    
+    // 300ms 후에 다시 전송 가능하도록 설정
+    setTimeout(() => {
+      isSubmitting = false;
+    }, 300);
+  }
+});
+
 // app.get('/', (req, res) => {
 //   res.sendFile(__dirname + '/public/index.html');
 // });
