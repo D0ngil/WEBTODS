@@ -54,7 +54,7 @@ async function sendToDiscord(webhookUrl, content) {
 // 메시지 전송 API
 app.post('/api/chat', async (req, res) => {
   try {
-    let { message } = req.body;
+    const { message } = req.body;
 
     // 입력 값 검증 (유효성 검사 및 길이 제한)
     if (!message || message.length > 200) {
@@ -66,18 +66,17 @@ app.post('/api/chat', async (req, res) => {
 
     // Discord로 전송
     await sendToDiscord(DISCORD_WEBHOOK_URL, sanitizedMessage);
-    console.log('디스코드로 전송된 메시지:', sanitizedMessage);
+    // console.log('디스코드로 전송된 메시지:', sanitizedMessage);
 
     return res.status(200).json({ success: true, msg: '메시지 전송 성공' });
-  } catch (error) {
-    console.error('디스코드 전송 에러:', error);
-    return res.status(500).json({ success: false, error: '디스코드 메시지 전송 실패' });
-  }
+  } catch {
+  return res.status(500).json({ success: false, error: '디스코드 메시지 전송 실패' });
+  } 
 });
 
-// 서버 시작
+// 서버 시작ㅞㅌ 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-  console.log(__dirname);
-  console.log(process.cwd());
+  // console.log(`Server is running on http://localhost:${port}`);
+  // console.log(__dirname);
+  // console.log(process.cwd());
 });
