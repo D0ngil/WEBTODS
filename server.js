@@ -70,11 +70,11 @@ app.post('/api/chat', async (req, res) => {
 
     return res.status(200).json({ success: true, msg: '메시지 전송 성공' });
   } catch {
-  return res.status(500).json({ success: false, error: '디스코드 메시지 전송 실패' });
+    return res.status(500).json({ success: false, error: '디스코드 메시지 전송 실패' });
   } 
 });
 
-// 서버 시작ㅞㅌ 
+// 서버 시작
 app.listen(port, () => {
   // console.log(`Server is running on http://localhost:${port}`);
   // console.log(__dirname);
