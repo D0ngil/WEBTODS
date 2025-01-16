@@ -10,7 +10,6 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 dotenv.config();
 
 const app = express();
-const port = 3000;
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
@@ -74,11 +73,9 @@ app.post('/api/chat', async (req, res) => {
   } 
 });
 
-// 서버 시작
-app.listen(port, () => {
-  // console.log(`Server is running on http://localhost:${port}`);
-  // console.log(__dirname);
-  // console.log(process.cwd());
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
 
 // GitHub Actions에서 실행 후 종료되도록 10초 뒤 서버를 닫음 (테스트용)
