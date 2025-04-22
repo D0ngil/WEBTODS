@@ -78,11 +78,11 @@ const server = app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
 
-// GitHub Actions에서 실행 후 종료되도록 10초 뒤 서버를 닫음 (테스트용)
-if (process.env.NODE_ENV === 'ci') {
-  setTimeout(() => {
-    server.close(() => {
-      console.log('CI build complete, server closed.');
-    });
-  }, 10000);  // 10초 뒤 종료
-}
+// // GitHub Actions에서 실행 후 종료되도록 10초 뒤 서버를 닫음 (테스트용)
+// if (process.env.NODE_ENV === 'ci') {
+//   setTimeout(() => {
+//     server.close(() => {
+//       console.log('CI build complete, server closed.');
+//     });
+//   }, 10000);  // 10초 뒤 종료
+// }
